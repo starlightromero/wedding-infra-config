@@ -35,6 +35,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | The name of the kubernetes cluster to create | `string` | `"wedding-app"` | no |
 | <a name="input_do_token"></a> [do\_token](#input\_do\_token) | Access Token for Digital Ocean | `string` | n/a | yes |
+| <a name="input_mongodb_uri"></a> [mongodb\_uri](#input\_mongodb\_uri) | Mongo Database URI | `string` | n/a | yes |
 
 ## Outputs
 

@@ -21,3 +21,9 @@ variable "cluster_name" {
 #   description = "Hostname of website"
 #   default     = "charrington.xyz"
 # }
+
+variable "mongodb_uri" {
+  type        = string
+  description = "Mongo Database URI"
+  sensitive   = true
+}

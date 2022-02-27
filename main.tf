@@ -170,6 +170,10 @@ resource "kubernetes_deployment" "wedding" {
           port {
             container_port = 8080
           }
+          env {
+            name  = "MONGODB_URI"
+            value = var.mongodb_uri
+          }
           image_pull_policy = "Always"
 
           resources {
