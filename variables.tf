@@ -28,20 +28,20 @@ variable "mongodb_uri" {
   sensitive   = true
 }
 
-# variable "mongo_initdb_database" {
-#   type        = string
-#   description = "Mongo database Name"
-#   sensitive   = true
-# }
+variable "mongo_initdb_database" {
+  type        = string
+  description = "Mongo database Name"
+  sensitive   = true
+}
 
-# variable "mongo_initdb_username" {
-#   type        = string
-#   description = "Mongo database username"
-#   sensitive   = true
-# }
+variable "mongo_initdb_username" {
+  type        = string
+  description = "Mongo database username"
+  sensitive   = true
+}
 
-# variable "mongo_initdb_password" {
-#   type        = string
-#   description = "Mongo database password"
-#   sensitive   = true
-# }
+variable "mongo_initdb_password" {
+  type        = string
+  description = "Mongo database password"
+  sensitive   = true
+}

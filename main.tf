@@ -204,154 +204,154 @@ resource "kubernetes_deployment" "wedding" {
   }
 }
 
-# resource "kubernetes_service" "mongo" {
-#   metadata {
-#     name      = "mongo"
-#     namespace = var.cluster_name
-#   }
+resource "kubernetes_service" "mongo" {
+  metadata {
+    name      = "mongo"
+    namespace = var.cluster_name
+  }
 
-#   spec {
-#     selector = {
-#       app = kubernetes_stateful_set.mongo.metadata[0].labels.app
-#     }
-#     port {
-#       port        = 27017
-#       target_port = 27017
-#     }
+  spec {
+    selector = {
+      app = kubernetes_stateful_set.mongo.metadata[0].labels.app
+    }
+    port {
+      port        = 27017
+      target_port = 27017
+    }
 
-#     type = "ClusterIP"
-#   }
-# }
+    type = "ClusterIP"
+  }
+}
 
-# resource "kubernetes_stateful_set" "mongo" {
-#   metadata {
-#     name      = "mongo"
-#     namespace = var.cluster_name
-#     labels = {
-#       app = "mongo"
-#     }
-#   }
+resource "kubernetes_stateful_set" "mongo" {
+  metadata {
+    name      = "mongo"
+    namespace = var.cluster_name
+    labels = {
+      app = "mongo"
+    }
+  }
 
-#   spec {
-#     pod_management_policy = "Parallel"
-#     replicas              = 3
+  spec {
+    pod_management_policy = "Parallel"
+    replicas              = 3
 
-#     selector {
-#       match_labels = {
-#         name = "mongo"
-#       }
-#     }
+    selector {
+      match_labels = {
+        name = "mongo"
+      }
+    }
 
-#     service_name = "mongo"
+    service_name = "mongo"
 
-#     template {
-#       metadata {
-#         labels = {
-#           name = "mongo"
-#         }
+    template {
+      metadata {
+        labels = {
+          name = "mongo"
+        }
 
-#         annotations = {}
-#       }
+        annotations = {}
+      }
 
-#       spec {
-#         # service_account_name             = "mongo"
-#         termination_grace_period_seconds = 300
+      spec {
+        # service_account_name             = "mongo"
+        termination_grace_period_seconds = 300
 
-#         container {
-#           name              = "mongo"
-#           image             = "mongo"
-#           image_pull_policy = "IfNotPresent"
+        container {
+          name              = "mongo"
+          image             = "mongo"
+          image_pull_policy = "IfNotPresent"
 
-#           args = [
-#             "mongo",
-#             "--bind_ip",
-#             "0.0.0.0",
-#             "--replSet",
-#             "MainRepSet"
-#           ]
+          args = [
+            "mongo",
+            "--bind_ip",
+            "0.0.0.0",
+            "--replSet",
+            "MainRepSet"
+          ]
 
-#           port {
-#             container_port = 27017
-#           }
+          port {
+            container_port = 27017
+          }
 
-#           env {
-#             name  = "MONGO_INITDB_DATABASE"
-#             value = var.mongo_initdb_database
-#           }
+          env {
+            name  = "MONGO_INITDB_DATABASE"
+            value = var.mongo_initdb_database
+          }
 
-#           env {
-#             name  = "MONGO_INITDB_USERNAME"
-#             value = var.mongo_initdb_username
-#           }
+          env {
+            name  = "MONGO_INITDB_USERNAME"
+            value = var.mongo_initdb_username
+          }
 
-#           env {
-#             name  = "MONGO_INITDB_PASSWORD"
-#             value = var.mongo_initdb_password
-#           }
+          env {
+            name  = "MONGO_INITDB_PASSWORD"
+            value = var.mongo_initdb_password
+          }
 
-#           volume_mount {
-#             name       = "mongo-persistent-storage-claim"
-#             mount_path = "/data/db"
-#           }
+          volume_mount {
+            name       = "mongo-persistent-storage-claim"
+            mount_path = "/data/db"
+          }
 
-#           resources {
-#             limits = {
-#               cpu    = "0.2"
-#               memory = "200Mi"
-#             }
+          resources {
+            limits = {
+              cpu    = "0.2"
+              memory = "200Mi"
+            }
 
-#             requests = {
-#               cpu    = "0.2"
-#               memory = "200Mi"
-#             }
-#           }
-#         }
+            requests = {
+              cpu    = "0.2"
+              memory = "200Mi"
+            }
+          }
+        }
 
-#         volume {
-#           name = "mongo"
+        volume {
+          name = "mongo"
 
-#           config_map {
-#             name = "mongo"
-#           }
-#         }
-#       }
-#     }
+          config_map {
+            name = "mongo"
+          }
+        }
+      }
+    }
 
-#     update_strategy {
-#       type = "RollingUpdate"
+    update_strategy {
+      type = "RollingUpdate"
 
-#       rolling_update {
-#         partition = 1
-#       }
-#     }
+      rolling_update {
+        partition = 1
+      }
+    }
 
-#     volume_claim_template {
-#       metadata {
-#         name = "mongo-persistent-storage-claim"
+    volume_claim_template {
+      metadata {
+        name = "mongo-persistent-storage-claim"
 
-#         annotations = {
-#           "volume.beta.kubernetes.io/storage-class" = "standard"
-#         }
-#       }
+        annotations = {
+          "volume.beta.kubernetes.io/storage-class" = "standard"
+        }
+      }
 
-#       spec {
-#         access_modes       = ["ReadWriteOnce"]
-#         storage_class_name = kubernetes_storage_class.this.metadata.name
+      spec {
+        access_modes       = ["ReadWriteOnce"]
+        storage_class_name = "standard"
+        # storage_class_name = kubernetes_storage_class.this.metadata.name
 
-#         resources {
-#           requests = {
-#             storage = "1Gi"
-#           }
-#         }
-#       }
-#     }
-#   }
-# }
+        resources {
+          requests = {
+            storage = "1Gi"
+          }
+        }
+      }
+    }
+  }
+}
 
 # resource "kubernetes_storage_class" "this" {
 #   metadata {
-#     name      = "${var.cluster_name}-storage-class"
-#     namespace = var.cluster_name
+#     name = "${var.cluster_name}-storage-class"
 #   }
 #   storage_provisioner = "kubernetes.io/gce-pd"
 #   reclaim_policy      = "Retain"
