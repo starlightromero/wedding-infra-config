@@ -8,53 +8,53 @@ resource "kubernetes_namespace" "wedding_app" {
   }
 }
 
-# resource "helm_release" "cert_manager" {
-#   name       = "cert-manager"
-#   repository = "https://charts.jetstack.io"
-#   chart      = "cert-manager"
-#   version    = "v1.7.1"
-#   namespace  = "kube-system"
-#   set {
-#     name  = "createCustomResource"
-#     value = "true"
-#   }
-#   set {
-#     name  = "installCRDs"
-#     value = "true"
-#   }
-# }
+resource "helm_release" "cert_manager" {
+  name       = "cert-manager"
+  repository = "https://charts.jetstack.io"
+  chart      = "cert-manager"
+  version    = "v1.7.1"
+  namespace  = "kube-system"
+  set {
+    name  = "createCustomResource"
+    value = "true"
+  }
+  set {
+    name  = "installCRDs"
+    value = "true"
+  }
+}
 
-# resource "kubernetes_manifest" "cluster_issuer" {
-#   depends_on = [
-#     helm_release.cert_manager,
-#   ]
+resource "kubernetes_manifest" "cluster_issuer" {
+  depends_on = [
+    helm_release.cert_manager,
+  ]
 
-#   manifest = {
-#     "apiVersion" = "cert-manager.io/v1"
-#     "kind"       = "ClusterIssuer"
-#     "metadata" = {
-#       "name" = "letsencrypt-production"
-#     }
-#     spec = {
-#       acme = {
-#         email  = "starlightromero@protonmail.com"
-#         server = "https://acme-v02.api.letsencrypt.org/directory"
-#         privateKeySecretRef = {
-#           name = "letsencrypt-production"
-#         }
-#         solvers = [
-#           {
-#             http01 = {
-#               ingress = {
-#                 class = "nginx"
-#               }
-#             }
-#           }
-#         ]
-#       }
-#     }
-#   }
-# }
+  manifest = {
+    "apiVersion" = "cert-manager.io/v1"
+    "kind"       = "ClusterIssuer"
+    "metadata" = {
+      "name" = "letsencrypt-production"
+    }
+    spec = {
+      acme = {
+        email  = "starlightromero@protonmail.com"
+        server = "https://acme-v02.api.letsencrypt.org/directory"
+        privateKeySecretRef = {
+          name = "letsencrypt-production"
+        }
+        solvers = [
+          {
+            http01 = {
+              ingress = {
+                class = "nginx"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
 
 resource "helm_release" "nginx_ingress_chart" {
   name       = "nginx-ingress-controller"
@@ -81,7 +81,7 @@ resource "kubernetes_ingress" "ingress" {
     annotations = {
       "kubernetes.io/ingress.class"          = "nginx"
       "ingress.kubernetes.io/rewrite-target" = "/"
-      # "cert-manager.io/cluster-issuer"       = "letsencrypt-production"
+      "cert-manager.io/cluster-issuer"       = "letsencrypt-production"
     }
   }
   spec {
@@ -97,10 +97,10 @@ resource "kubernetes_ingress" "ingress" {
         }
       }
     }
-    # tls {
-    #   secret_name = "letsencrypt-production"
-    #   hosts       = [var.hostname]
-    # }
+    tls {
+      secret_name = "letsencrypt-production"
+      hosts       = [var.hostname]
+    }
   }
 }
 
@@ -112,9 +112,9 @@ resource "kubernetes_ingress" "ingress_admin" {
     name      = "${var.cluster_name}-ingress-admin"
     namespace = "kube-system"
     annotations = {
-      "kubernetes.io/ingress.class"          = "nginx"
-      "ingress.kubernetes.io/rewrite-target" = "/"
-      # "cert-manager.io/cluster-issuer"                     = "letsencrypt-production"
+      "kubernetes.io/ingress.class"                        = "nginx"
+      "ingress.kubernetes.io/rewrite-target"               = "/"
+      "cert-manager.io/cluster-issuer"                     = "letsencrypt-production"
       "nginx.ingress.kubernetes.io/whitelist-source-range" = "75.128.58.244/32"
     }
   }
@@ -131,10 +131,10 @@ resource "kubernetes_ingress" "ingress_admin" {
         }
       }
     }
-    # tls {
-    #   secret_name = "letsencrypt-production"
-    #   hosts       = [var.hostname]
-    # }
+    tls {
+      secret_name = "letsencrypt-production"
+      hosts       = [var.hostname]
+    }
   }
 }
 
