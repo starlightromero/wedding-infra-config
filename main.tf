@@ -254,7 +254,7 @@ resource "kubernetes_stateful_set" "mongo" {
       }
 
       spec {
-        service_account_name             = "mongo"
+        # service_account_name             = "mongo"
         termination_grace_period_seconds = 300
 
         container {
