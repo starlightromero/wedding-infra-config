@@ -31,7 +31,6 @@ No modules.
 | [kubernetes_deployment.wedding](https://registry.terraform.io/providers/hashicorp/kubernetes/2.8.0/docs/resources/deployment) | resource |
 | [kubernetes_ingress.ingress](https://registry.terraform.io/providers/hashicorp/kubernetes/2.8.0/docs/resources/ingress) | resource |
 | [kubernetes_ingress.ingress_admin](https://registry.terraform.io/providers/hashicorp/kubernetes/2.8.0/docs/resources/ingress) | resource |
-| [kubernetes_manifest.cluster_issuer](https://registry.terraform.io/providers/hashicorp/kubernetes/2.8.0/docs/resources/manifest) | resource |
 | [kubernetes_namespace.wedding_app](https://registry.terraform.io/providers/hashicorp/kubernetes/2.8.0/docs/resources/namespace) | resource |
 | [kubernetes_service.wedding](https://registry.terraform.io/providers/hashicorp/kubernetes/2.8.0/docs/resources/service) | resource |
 | [digitalocean_kubernetes_cluster.this](https://registry.terraform.io/providers/digitalocean/digitalocean/2.17.0/docs/data-sources/kubernetes_cluster) | data source |

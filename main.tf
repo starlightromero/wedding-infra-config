@@ -24,37 +24,37 @@ resource "helm_release" "cert_manager" {
   }
 }
 
-resource "kubernetes_manifest" "cluster_issuer" {
-  depends_on = [
-    helm_release.cert_manager,
-  ]
+# resource "kubernetes_manifest" "cluster_issuer" {
+#   depends_on = [
+#     helm_release.cert_manager,
+#   ]
 
-  manifest = {
-    "apiVersion" = "cert-manager.io/v1"
-    "kind"       = "ClusterIssuer"
-    "metadata" = {
-      "name" = "letsencrypt-production"
-    }
-    spec = {
-      acme = {
-        email  = "starlightromero@protonmail.com"
-        server = "https://acme-v02.api.letsencrypt.org/directory"
-        privateKeySecretRef = {
-          name = "letsencrypt-production"
-        }
-        solvers = [
-          {
-            http01 = {
-              ingress = {
-                class = "nginx"
-              }
-            }
-          }
-        ]
-      }
-    }
-  }
-}
+#   manifest = {
+#     "apiVersion" = "cert-manager.io/v1"
+#     "kind"       = "ClusterIssuer"
+#     "metadata" = {
+#       "name" = "letsencrypt-production"
+#     }
+#     spec = {
+#       acme = {
+#         email  = "starlightromero@protonmail.com"
+#         server = "https://acme-v02.api.letsencrypt.org/directory"
+#         privateKeySecretRef = {
+#           name = "letsencrypt-production"
+#         }
+#         solvers = [
+#           {
+#             http01 = {
+#               ingress = {
+#                 class = "nginx"
+#               }
+#             }
+#           }
+#         ]
+#       }
+#     }
+#   }
+# }
 
 resource "helm_release" "nginx_ingress_chart" {
   name       = "nginx-ingress-controller"
