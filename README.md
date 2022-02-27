@@ -26,7 +26,6 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [helm_release.cert_manager](https://registry.terraform.io/providers/hashicorp/helm/2.4.1/docs/resources/release) | resource |
 | [helm_release.nginx_ingress_chart](https://registry.terraform.io/providers/hashicorp/helm/2.4.1/docs/resources/release) | resource |
 | [kubernetes_deployment.wedding](https://registry.terraform.io/providers/hashicorp/kubernetes/2.8.0/docs/resources/deployment) | resource |
 | [kubernetes_ingress.ingress](https://registry.terraform.io/providers/hashicorp/kubernetes/2.8.0/docs/resources/ingress) | resource |
