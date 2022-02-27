@@ -14,7 +14,6 @@ resource "helm_release" "cert_manager" {
   chart      = "cert-manager"
   version    = "v1.6.1"
   namespace  = "kube-system"
-  timeout    = 120
   set {
     name  = "createCustomResource"
     value = "true"
