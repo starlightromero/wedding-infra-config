@@ -24,18 +24,18 @@ resource "helm_release" "cert_manager" {
   }
 }
 
-# resource "helm_release" "cluster_issuer" {
-#   name      = "cluster-issuer"
-#   chart     = "./helm_charts/cluster-issuer"
-#   namespace = "kube-system"
-#   depends_on = [
-#     helm_release.cert_manager,
-#   ]
-#   set {
-#     name  = "letsencrypt_email"
-#     value = var.letsencrypt_email
-#   }
-# }
+resource "helm_release" "cluster_issuer" {
+  name      = "cluster-issuer"
+  chart     = "./helm_charts/cluster-issuer"
+  namespace = "kube-system"
+  depends_on = [
+    helm_release.cert_manager,
+  ]
+  set {
+    name  = "letsencrypt_email"
+    value = var.letsencrypt_email
+  }
+}
 
 resource "helm_release" "nginx_ingress_chart" {
   name       = "nginx-ingress-controller"
@@ -62,7 +62,7 @@ resource "kubernetes_ingress" "ingress" {
     annotations = {
       "kubernetes.io/ingress.class"          = "nginx"
       "ingress.kubernetes.io/rewrite-target" = "/"
-      # "cert-manager.io/cluster-issuer"       = "letsencrypt-production"
+      "cert-manager.io/cluster-issuer"       = "letsencrypt-production"
     }
   }
   spec {
@@ -78,10 +78,10 @@ resource "kubernetes_ingress" "ingress" {
         }
       }
     }
-    # tls {
-    #   secret_name = "letsencrypt-production"
-    #   hosts       = [var.hostname]
-    # }
+    tls {
+      secret_name = "letsencrypt-production"
+      hosts       = [var.hostname]
+    }
   }
 }
 
@@ -93,9 +93,9 @@ resource "kubernetes_ingress" "ingress_admin" {
     name      = "${var.cluster_name}-ingress-admin"
     namespace = var.cluster_name
     annotations = {
-      "kubernetes.io/ingress.class"          = "nginx"
-      "ingress.kubernetes.io/rewrite-target" = "/"
-      # "cert-manager.io/cluster-issuer"                     = "letsencrypt-production"
+      "kubernetes.io/ingress.class"                        = "nginx"
+      "ingress.kubernetes.io/rewrite-target"               = "/"
+      "cert-manager.io/cluster-issuer"                     = "letsencrypt-production"
       "nginx.ingress.kubernetes.io/whitelist-source-range" = "75.128.58.244/32"
     }
   }
@@ -112,10 +112,10 @@ resource "kubernetes_ingress" "ingress_admin" {
         }
       }
     }
-    # tls {
-    #   secret_name = "letsencrypt-production"
-    #   hosts       = [var.hostname]
-    # }
+    tls {
+      secret_name = "letsencrypt-production"
+      hosts       = [var.hostname]
+    }
   }
 }
 
