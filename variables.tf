@@ -16,8 +16,8 @@ variable "cluster_name" {
 #   default     = "starlightromero@protonmail.com"
 # }
 
-variable "hostname" {
-  type        = string
-  description = "Hostname of website"
-  default     = "charrington.xyz"
-}
+# variable "hostname" {
+#   type        = string
+#   description = "Hostname of website"
+#   default     = "charrington.xyz"
+# }

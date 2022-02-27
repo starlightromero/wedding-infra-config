@@ -1,6 +1,6 @@
-data "digitalocean_loadbalancer" "this" {
-  name = "${var.cluster_name}-lb"
-}
+# data "digitalocean_loadbalancer" "this" {
+#   name = "${var.cluster_name}-lb"
+# }
 
 resource "kubernetes_namespace" "wedding_app" {
   metadata {
@@ -37,106 +37,106 @@ resource "kubernetes_namespace" "wedding_app" {
 #   }
 # }
 
-resource "helm_release" "nginx_ingress_chart" {
-  name       = "nginx-ingress-controller"
-  namespace  = "wedding-app"
-  repository = "https://charts.bitnami.com/bitnami"
-  chart      = "nginx-ingress-controller"
-  set {
-    name  = "service.type"
-    value = "LoadBalancer"
-  }
-  set {
-    name  = "service.annotations.kubernetes\\.digitalocean\\.com/load-balancer-id"
-    value = data.digitalocean_loadbalancer.this.id
-  }
-}
+# resource "helm_release" "nginx_ingress_chart" {
+#   name       = "nginx-ingress-controller"
+#   namespace  = "wedding-app"
+#   repository = "https://charts.bitnami.com/bitnami"
+#   chart      = "nginx-ingress-controller"
+#   set {
+#     name  = "service.type"
+#     value = "LoadBalancer"
+#   }
+#   set {
+#     name  = "service.annotations.kubernetes\\.digitalocean\\.com/load-balancer-id"
+#     value = data.digitalocean_loadbalancer.this.id
+#   }
+# }
 
-resource "kubernetes_ingress" "ingress" {
-  depends_on = [
-    helm_release.nginx_ingress_chart,
-  ]
-  metadata {
-    name      = "${var.cluster_name}-ingress"
-    namespace = "wedding-app"
-    annotations = {
-      "kubernetes.io/ingress.class"          = "nginx"
-      "ingress.kubernetes.io/rewrite-target" = "/"
-      # "cert-manager.io/cluster-issuer"       = "letsencrypt-production"
-    }
-  }
-  spec {
-    rule {
-      host = var.hostname
-      http {
-        path {
-          backend {
-            service_name = kubernetes_service.wedding.metadata[0].name
-            service_port = 80
-          }
-          path = "/"
-        }
-      }
-    }
-    # tls {
-    #   secret_name = "letsencrypt-production"
-    #   hosts       = [var.hostname]
-    # }
-  }
-}
+# resource "kubernetes_ingress" "ingress" {
+#   depends_on = [
+#     helm_release.nginx_ingress_chart,
+#   ]
+#   metadata {
+#     name      = "${var.cluster_name}-ingress"
+#     namespace = "wedding-app"
+#     annotations = {
+#       "kubernetes.io/ingress.class"          = "nginx"
+#       "ingress.kubernetes.io/rewrite-target" = "/"
+#       # "cert-manager.io/cluster-issuer"       = "letsencrypt-production"
+#     }
+#   }
+#   spec {
+#     rule {
+#       host = var.hostname
+#       http {
+#         path {
+#           backend {
+#             service_name = kubernetes_service.wedding.metadata[0].name
+#             service_port = 80
+#           }
+#           path = "/"
+#         }
+#       }
+#     }
+#     # tls {
+#     #   secret_name = "letsencrypt-production"
+#     #   hosts       = [var.hostname]
+#     # }
+#   }
+# }
 
-resource "kubernetes_ingress" "ingress_admin" {
-  depends_on = [
-    helm_release.nginx_ingress_chart,
-  ]
-  metadata {
-    name      = "${var.cluster_name}-ingress-admin"
-    namespace = "wedding-app"
-    annotations = {
-      "kubernetes.io/ingress.class"          = "nginx"
-      "ingress.kubernetes.io/rewrite-target" = "/"
-      # "cert-manager.io/cluster-issuer"                     = "letsencrypt-production"
-      "nginx.ingress.kubernetes.io/whitelist-source-range" = "75.128.58.244/32"
-    }
-  }
-  spec {
-    rule {
-      host = var.hostname
-      http {
-        path {
-          backend {
-            service_name = kubernetes_service.wedding.metadata[0].name
-            service_port = 80
-          }
-          path = "/rsvp"
-        }
-      }
-    }
-    # tls {
-    #   secret_name = "letsencrypt-production"
-    #   hosts       = [var.hostname]
-    # }
-  }
-}
+# resource "kubernetes_ingress" "ingress_admin" {
+#   depends_on = [
+#     helm_release.nginx_ingress_chart,
+#   ]
+#   metadata {
+#     name      = "${var.cluster_name}-ingress-admin"
+#     namespace = "wedding-app"
+#     annotations = {
+#       "kubernetes.io/ingress.class"          = "nginx"
+#       "ingress.kubernetes.io/rewrite-target" = "/"
+#       # "cert-manager.io/cluster-issuer"                     = "letsencrypt-production"
+#       "nginx.ingress.kubernetes.io/whitelist-source-range" = "75.128.58.244/32"
+#     }
+#   }
+#   spec {
+#     rule {
+#       host = var.hostname
+#       http {
+#         path {
+#           backend {
+#             service_name = kubernetes_service.wedding.metadata[0].name
+#             service_port = 80
+#           }
+#           path = "/rsvp"
+#         }
+#       }
+#     }
+#     # tls {
+#     #   secret_name = "letsencrypt-production"
+#     #   hosts       = [var.hostname]
+#     # }
+#   }
+# }
 
-resource "kubernetes_service" "wedding" {
-  metadata {
-    name      = "wedding"
-    namespace = "wedding-app"
-  }
+# resource "kubernetes_service" "wedding" {
+#   metadata {
+#     name      = "wedding"
+#     namespace = "wedding-app"
+#   }
 
-  spec {
-    selector = {
-      app = kubernetes_deployment.wedding.metadata[0].labels.app
-    }
-    port {
-      port        = 80
-      target_port = 8080
-    }
+#   spec {
+#     selector = {
+#       app = kubernetes_deployment.wedding.metadata[0].labels.app
+#     }
+#     port {
+#       port        = 80
+#       target_port = 8080
+#     }
 
-    type = "ClusterIP"
-  }
-}
+#     type = "ClusterIP"
+#   }
+# }
 
 resource "kubernetes_deployment" "wedding" {
   metadata {
@@ -198,131 +198,131 @@ resource "kubernetes_deployment" "wedding" {
   }
 }
 
-resource "kubernetes_service" "mongo" {
-  metadata {
-    name      = "mongo"
-    namespace = "wedding-app"
-  }
+# resource "kubernetes_service" "mongo" {
+#   metadata {
+#     name      = "mongo"
+#     namespace = "wedding-app"
+#   }
 
-  spec {
-    selector = {
-      app = kubernetes_stateful_set.mongo.metadata[0].labels.app
-    }
-    port {
-      port        = 27017
-      target_port = 27017
-    }
+#   spec {
+#     selector = {
+#       app = kubernetes_stateful_set.mongo.metadata[0].labels.app
+#     }
+#     port {
+#       port        = 27017
+#       target_port = 27017
+#     }
 
-    type = "ClusterIP"
-  }
-}
+#     type = "ClusterIP"
+#   }
+# }
 
-resource "kubernetes_stateful_set" "mongo" {
-  metadata {
-    name      = "mongo"
-    namespace = "wedding-app"
-    labels = {
-      app = "mongo"
-    }
-  }
+# resource "kubernetes_stateful_set" "mongo" {
+#   metadata {
+#     name      = "mongo"
+#     namespace = "wedding-app"
+#     labels = {
+#       app = "mongo"
+#     }
+#   }
 
-  spec {
-    pod_management_policy = "Parallel"
-    replicas              = 3
+#   spec {
+#     pod_management_policy = "Parallel"
+#     replicas              = 3
 
-    selector {
-      match_labels = {
-        name = "mongo"
-      }
-    }
+#     selector {
+#       match_labels = {
+#         name = "mongo"
+#       }
+#     }
 
-    service_name = "mongo"
+#     service_name = "mongo"
 
-    template {
-      metadata {
-        labels = {
-          name = "mongo"
-        }
+#     template {
+#       metadata {
+#         labels = {
+#           name = "mongo"
+#         }
 
-        annotations = {}
-      }
+#         annotations = {}
+#       }
 
-      spec {
-        service_account_name             = "mongo"
-        termination_grace_period_seconds = 300
+#       spec {
+#         service_account_name             = "mongo"
+#         termination_grace_period_seconds = 300
 
-        container {
-          name              = "mongo"
-          image             = "mongo"
-          image_pull_policy = "IfNotPresent"
+#         container {
+#           name              = "mongo"
+#           image             = "mongo"
+#           image_pull_policy = "IfNotPresent"
 
-          args = [
-            "mongo",
-            "--bind_ip",
-            "0.0.0.0",
-            "--replSet",
-            "MainRepSet"
-          ]
+#           args = [
+#             "mongo",
+#             "--bind_ip",
+#             "0.0.0.0",
+#             "--replSet",
+#             "MainRepSet"
+#           ]
 
-          port {
-            container_port = 27017
-          }
+#           port {
+#             container_port = 27017
+#           }
 
-          volume_mount {
-            name       = "mongo-persistent-storage-claim"
-            mount_path = "/data/db"
-          }
+#           volume_mount {
+#             name       = "mongo-persistent-storage-claim"
+#             mount_path = "/data/db"
+#           }
 
-          resources {
-            limits = {
-              cpu    = "0.2"
-              memory = "200Mi"
-            }
+#           resources {
+#             limits = {
+#               cpu    = "0.2"
+#               memory = "200Mi"
+#             }
 
-            requests = {
-              cpu    = "0.2"
-              memory = "200Mi"
-            }
-          }
-        }
+#             requests = {
+#               cpu    = "0.2"
+#               memory = "200Mi"
+#             }
+#           }
+#         }
 
-        volume {
-          name = "mongo"
+#         volume {
+#           name = "mongo"
 
-          config_map {
-            name = "mongo"
-          }
-        }
-      }
-    }
+#           config_map {
+#             name = "mongo"
+#           }
+#         }
+#       }
+#     }
 
-    update_strategy {
-      type = "RollingUpdate"
+#     update_strategy {
+#       type = "RollingUpdate"
 
-      rolling_update {
-        partition = 1
-      }
-    }
+#       rolling_update {
+#         partition = 1
+#       }
+#     }
 
-    volume_claim_template {
-      metadata {
-        name = "mongo-persistent-storage-claim"
+#     volume_claim_template {
+#       metadata {
+#         name = "mongo-persistent-storage-claim"
 
-        annotations = {
-          "volume.beta.kubernetes.io/storage-class" = "standard"
-        }
-      }
+#         annotations = {
+#           "volume.beta.kubernetes.io/storage-class" = "standard"
+#         }
+#       }
 
-      spec {
-        access_modes       = ["ReadWriteOnce"]
-        storage_class_name = "standard"
+#       spec {
+#         access_modes       = ["ReadWriteOnce"]
+#         storage_class_name = "standard"
 
-        resources {
-          requests = {
-            storage = "1Gi"
-          }
-        }
-      }
-    }
-  }
-}
+#         resources {
+#           requests = {
+#             storage = "1Gi"
+#           }
+#         }
+#       }
+#     }
+#   }
+# }
