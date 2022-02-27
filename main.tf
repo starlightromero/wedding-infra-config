@@ -119,24 +119,24 @@ resource "kubernetes_namespace" "wedding_app" {
 #   }
 # }
 
-# resource "kubernetes_service" "wedding" {
-#   metadata {
-#     name      = "wedding"
-#     namespace = "wedding-app"
-#   }
+resource "kubernetes_service" "wedding" {
+  metadata {
+    name      = "wedding"
+    namespace = "wedding-app"
+  }
 
-#   spec {
-#     selector = {
-#       app = kubernetes_deployment.wedding.metadata[0].labels.app
-#     }
-#     port {
-#       port        = 80
-#       target_port = 8080
-#     }
+  spec {
+    selector = {
+      app = kubernetes_deployment.wedding.metadata[0].labels.app
+    }
+    port {
+      port        = 80
+      target_port = 8080
+    }
 
-#     type = "ClusterIP"
-#   }
-# }
+    type = "ClusterIP"
+  }
+}
 
 resource "kubernetes_deployment" "wedding" {
   metadata {
@@ -165,16 +165,18 @@ resource "kubernetes_deployment" "wedding" {
 
       spec {
         container {
-          image = "starlightromero/wedding-app"
-          name  = "wedding-app"
+          image             = "starlightromero/wedding-app"
+          name              = "wedding-app"
+          image_pull_policy = "Always"
+
           port {
             container_port = 8080
           }
+
           env {
             name  = "MONGODB_URI"
             value = var.mongodb_uri
           }
-          image_pull_policy = "Always"
 
           resources {
             limits = {
@@ -202,131 +204,146 @@ resource "kubernetes_deployment" "wedding" {
   }
 }
 
-# resource "kubernetes_service" "mongo" {
-#   metadata {
-#     name      = "mongo"
-#     namespace = "wedding-app"
-#   }
+resource "kubernetes_service" "mongo" {
+  metadata {
+    name      = "mongo"
+    namespace = "wedding-app"
+  }
 
-#   spec {
-#     selector = {
-#       app = kubernetes_stateful_set.mongo.metadata[0].labels.app
-#     }
-#     port {
-#       port        = 27017
-#       target_port = 27017
-#     }
+  spec {
+    selector = {
+      app = kubernetes_stateful_set.mongo.metadata[0].labels.app
+    }
+    port {
+      port        = 27017
+      target_port = 27017
+    }
 
-#     type = "ClusterIP"
-#   }
-# }
+    type = "ClusterIP"
+  }
+}
 
-# resource "kubernetes_stateful_set" "mongo" {
-#   metadata {
-#     name      = "mongo"
-#     namespace = "wedding-app"
-#     labels = {
-#       app = "mongo"
-#     }
-#   }
+resource "kubernetes_stateful_set" "mongo" {
+  metadata {
+    name      = "mongo"
+    namespace = "wedding-app"
+    labels = {
+      app = "mongo"
+    }
+  }
 
-#   spec {
-#     pod_management_policy = "Parallel"
-#     replicas              = 3
+  spec {
+    pod_management_policy = "Parallel"
+    replicas              = 3
 
-#     selector {
-#       match_labels = {
-#         name = "mongo"
-#       }
-#     }
+    selector {
+      match_labels = {
+        name = "mongo"
+      }
+    }
 
-#     service_name = "mongo"
+    service_name = "mongo"
 
-#     template {
-#       metadata {
-#         labels = {
-#           name = "mongo"
-#         }
+    template {
+      metadata {
+        labels = {
+          name = "mongo"
+        }
 
-#         annotations = {}
-#       }
+        annotations = {}
+      }
 
-#       spec {
-#         service_account_name             = "mongo"
-#         termination_grace_period_seconds = 300
+      spec {
+        service_account_name             = "mongo"
+        termination_grace_period_seconds = 300
 
-#         container {
-#           name              = "mongo"
-#           image             = "mongo"
-#           image_pull_policy = "IfNotPresent"
+        container {
+          name              = "mongo"
+          image             = "mongo"
+          image_pull_policy = "IfNotPresent"
 
-#           args = [
-#             "mongo",
-#             "--bind_ip",
-#             "0.0.0.0",
-#             "--replSet",
-#             "MainRepSet"
-#           ]
+          args = [
+            "mongo",
+            "--bind_ip",
+            "0.0.0.0",
+            "--replSet",
+            "MainRepSet"
+          ]
 
-#           port {
-#             container_port = 27017
-#           }
+          port {
+            container_port = 27017
+          }
 
-#           volume_mount {
-#             name       = "mongo-persistent-storage-claim"
-#             mount_path = "/data/db"
-#           }
+          env {
+            name  = "MONGO_INITDB_DATABASE"
+            value = var.mongo_initdb_database
+          }
 
-#           resources {
-#             limits = {
-#               cpu    = "0.2"
-#               memory = "200Mi"
-#             }
+          env {
+            name  = "MONGO_INITDB_USERNAME"
+            value = var.mongo_initdb_username
+          }
 
-#             requests = {
-#               cpu    = "0.2"
-#               memory = "200Mi"
-#             }
-#           }
-#         }
+          env {
+            name  = "MONGO_INITDB_PASSWORD"
+            value = var.mongo_initdb_password
+          }
 
-#         volume {
-#           name = "mongo"
+          volume_mount {
+            name       = "mongo-persistent-storage-claim"
+            mount_path = "/data/db"
+          }
 
-#           config_map {
-#             name = "mongo"
-#           }
-#         }
-#       }
-#     }
+          resources {
+            limits = {
+              cpu    = "0.2"
+              memory = "200Mi"
+            }
 
-#     update_strategy {
-#       type = "RollingUpdate"
+            requests = {
+              cpu    = "0.2"
+              memory = "200Mi"
+            }
+          }
+        }
 
-#       rolling_update {
-#         partition = 1
-#       }
-#     }
+        volume {
+          name = "mongo"
 
-#     volume_claim_template {
-#       metadata {
-#         name = "mongo-persistent-storage-claim"
+          config_map {
+            name = "mongo"
+          }
+        }
+      }
+    }
 
-#         annotations = {
-#           "volume.beta.kubernetes.io/storage-class" = "standard"
-#         }
-#       }
+    update_strategy {
+      type = "RollingUpdate"
 
-#       spec {
-#         access_modes       = ["ReadWriteOnce"]
-#         storage_class_name = "standard"
+      rolling_update {
+        partition = 1
+      }
+    }
 
-#         resources {
-#           requests = {
-#             storage = "1Gi"
-#           }
-#         }
-#       }
-#     }
-#   }
-# }
+    volume_claim_template {
+      metadata {
+        name = "mongo-persistent-storage-claim"
+
+        annotations = {
+          "volume.beta.kubernetes.io/storage-class" = "standard"
+        }
+      }
+
+      spec {
+        access_modes       = ["ReadWriteOnce"]
+        storage_class_name = "standard"
+
+        resources {
+          requests = {
+            storage = "1Gi"
+          }
+        }
+      }
+    }
+  }
+}
