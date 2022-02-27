@@ -10,12 +10,6 @@ variable "cluster_name" {
   default     = "wedding-app"
 }
 
-variable "letsencrypt_email" {
-  type        = string
-  description = "Email for letsencrypt"
-  default     = "starlightromero@protonmail.com"
-}
-
 variable "hostname" {
   type        = string
   description = "Hostname of website"
