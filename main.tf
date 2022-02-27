@@ -24,16 +24,33 @@ resource "helm_release" "cert_manager" {
   }
 }
 
-resource "helm_release" "cluster_issuer" {
-  name      = "cluster-issuer"
-  chart     = "./helm_charts/cluster-issuer"
-  namespace = "kube-system"
+resource "kubernetes_manifest" "cluster_issuer" {
   depends_on = [
     helm_release.cert_manager,
   ]
-  set {
-    name  = "letsencrypt_email"
-    value = var.letsencrypt_email
+
+  manifest = {
+    "apiVersion" = "cert-manager.io/v1"
+    "kind"       = "ClusterIssuer"
+    "metadata" = {
+      "name" = "letsencrypt-production"
+    }
+    spec = {
+      acme = {
+        email  = var.letsencrypt_email
+        server = "https://acme-v02.api.letsencrypt.org/directory"
+        privateKeySecretRef = {
+          name = "letsencrypt-production"
+        }
+        solvers = {
+          http01 = {
+            ingress = {
+              class = "nginx"
+            }
+          }
+        }
+      }
+    }
   }
 }
 
