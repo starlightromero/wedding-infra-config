@@ -2,11 +2,11 @@
 #   name = "${var.cluster_name}-lb"
 # }
 
-# resource "kubernetes_namespace" "wedding_app" {
-#   metadata {
-#     name = var.cluster_name
-#   }
-# }
+resource "kubernetes_namespace" "wedding_app" {
+  metadata {
+    name = var.cluster_name
+  }
+}
 
 # resource "helm_release" "cert_manager" {
 #   name       = "cert-manager"

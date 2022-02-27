@@ -15,6 +15,7 @@
 | Name | Version |
 |------|---------|
 | <a name="provider_digitalocean"></a> [digitalocean](#provider\_digitalocean) | 2.17.0 |
+| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | 2.8.0 |
 
 ## Modules
 
@@ -24,6 +25,7 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [kubernetes_namespace.wedding_app](https://registry.terraform.io/providers/hashicorp/kubernetes/2.8.0/docs/resources/namespace) | resource |
 | [digitalocean_kubernetes_cluster.this](https://registry.terraform.io/providers/digitalocean/digitalocean/2.17.0/docs/data-sources/kubernetes_cluster) | data source |
 
 ## Inputs
