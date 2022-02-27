@@ -21,21 +21,3 @@ variable "mongodb_uri" {
   description = "Mongo database URI"
   sensitive   = true
 }
-
-variable "mongo_initdb_database" {
-  type        = string
-  description = "Mongo database Name"
-  sensitive   = true
-}
-
-variable "mongo_initdb_username" {
-  type        = string
-  description = "Mongo database username"
-  sensitive   = true
-}
-
-variable "mongo_initdb_password" {
-  type        = string
-  description = "Mongo database password"
-  sensitive   = true
-}

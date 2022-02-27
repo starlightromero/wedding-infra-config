@@ -8,53 +8,53 @@ resource "kubernetes_namespace" "wedding_app" {
   }
 }
 
-resource "helm_release" "cert_manager" {
-  name       = "cert-manager"
-  repository = "https://charts.jetstack.io"
-  chart      = "cert-manager"
-  version    = "v1.7.1"
-  namespace  = "kube-system"
-  set {
-    name  = "createCustomResource"
-    value = "true"
-  }
-  set {
-    name  = "installCRDs"
-    value = "true"
-  }
-}
+# resource "helm_release" "cert_manager" {
+#   name       = "cert-manager"
+#   repository = "https://charts.jetstack.io"
+#   chart      = "cert-manager"
+#   version    = "v1.7.1"
+#   namespace  = "kube-system"
+#   set {
+#     name  = "createCustomResource"
+#     value = "true"
+#   }
+#   set {
+#     name  = "installCRDs"
+#     value = "true"
+#   }
+# }
 
-resource "kubernetes_manifest" "cluster_issuer" {
-  depends_on = [
-    helm_release.cert_manager,
-  ]
+# resource "kubernetes_manifest" "cluster_issuer" {
+#   depends_on = [
+#     helm_release.cert_manager,
+#   ]
 
-  manifest = {
-    "apiVersion" = "cert-manager.io/v1"
-    "kind"       = "ClusterIssuer"
-    "metadata" = {
-      "name" = "letsencrypt-production"
-    }
-    spec = {
-      acme = {
-        email  = "starlightromero@protonmail.com"
-        server = "https://acme-v02.api.letsencrypt.org/directory"
-        privateKeySecretRef = {
-          name = "letsencrypt-production"
-        }
-        solvers = [
-          {
-            http01 = {
-              ingress = {
-                class = "nginx"
-              }
-            }
-          }
-        ]
-      }
-    }
-  }
-}
+#   manifest = {
+#     "apiVersion" = "cert-manager.io/v1"
+#     "kind"       = "ClusterIssuer"
+#     "metadata" = {
+#       "name" = "letsencrypt-production"
+#     }
+#     spec = {
+#       acme = {
+#         email  = "starlightromero@protonmail.com"
+#         server = "https://acme-v02.api.letsencrypt.org/directory"
+#         privateKeySecretRef = {
+#           name = "letsencrypt-production"
+#         }
+#         solvers = [
+#           {
+#             http01 = {
+#               ingress = {
+#                 class = "nginx"
+#               }
+#             }
+#           }
+#         ]
+#       }
+#     }
+#   }
+# }
 
 resource "helm_release" "nginx_ingress_chart" {
   name       = "nginx-ingress-controller"
@@ -81,7 +81,7 @@ resource "kubernetes_ingress" "ingress" {
     annotations = {
       "kubernetes.io/ingress.class"          = "nginx"
       "ingress.kubernetes.io/rewrite-target" = "/"
-      "cert-manager.io/cluster-issuer"       = "letsencrypt-production"
+      # "cert-manager.io/cluster-issuer"       = "letsencrypt-production"
     }
   }
   spec {
@@ -97,10 +97,10 @@ resource "kubernetes_ingress" "ingress" {
         }
       }
     }
-    tls {
-      secret_name = "letsencrypt-production"
-      hosts       = [var.hostname]
-    }
+    # tls {
+    #   secret_name = "letsencrypt-production"
+    #   hosts       = [var.hostname]
+    # }
   }
 }
 
@@ -112,9 +112,9 @@ resource "kubernetes_ingress" "ingress_admin" {
     name      = "${var.cluster_name}-ingress-admin"
     namespace = "kube-system"
     annotations = {
-      "kubernetes.io/ingress.class"                        = "nginx"
-      "ingress.kubernetes.io/rewrite-target"               = "/"
-      "cert-manager.io/cluster-issuer"                     = "letsencrypt-production"
+      "kubernetes.io/ingress.class"          = "nginx"
+      "ingress.kubernetes.io/rewrite-target" = "/"
+      # "cert-manager.io/cluster-issuer"                     = "letsencrypt-production"
       "nginx.ingress.kubernetes.io/whitelist-source-range" = "75.128.58.244/32"
     }
   }
@@ -131,10 +131,10 @@ resource "kubernetes_ingress" "ingress_admin" {
         }
       }
     }
-    tls {
-      secret_name = "letsencrypt-production"
-      hosts       = [var.hostname]
-    }
+    # tls {
+    #   secret_name = "letsencrypt-production"
+    #   hosts       = [var.hostname]
+    # }
   }
 }
 
@@ -222,160 +222,3 @@ resource "kubernetes_deployment" "wedding" {
     }
   }
 }
-
-resource "kubernetes_service" "mongo" {
-  metadata {
-    name      = "mongo"
-    namespace = var.cluster_name
-  }
-
-  spec {
-    selector = {
-      app = kubernetes_stateful_set.mongo.metadata[0].labels.app
-    }
-    port {
-      port        = 27017
-      target_port = 27017
-    }
-
-    type = "ClusterIP"
-  }
-}
-
-resource "kubernetes_stateful_set" "mongo" {
-  metadata {
-    name      = "mongo"
-    namespace = var.cluster_name
-    labels = {
-      app = "mongo"
-    }
-  }
-
-  spec {
-    pod_management_policy = "Parallel"
-    replicas              = 3
-
-    selector {
-      match_labels = {
-        name = "mongo"
-      }
-    }
-
-    service_name = "mongo"
-
-    template {
-      metadata {
-        labels = {
-          name = "mongo"
-        }
-
-        annotations = {}
-      }
-
-      spec {
-        # service_account_name             = "mongo"
-        termination_grace_period_seconds = 300
-
-        container {
-          name              = "mongo"
-          image             = "mongo"
-          image_pull_policy = "IfNotPresent"
-
-          args = [
-            "mongo",
-            "--bind_ip",
-            "0.0.0.0",
-            "--replSet",
-            "MainRepSet"
-          ]
-
-          port {
-            container_port = 27017
-          }
-
-          env {
-            name  = "MONGO_INITDB_DATABASE"
-            value = var.mongo_initdb_database
-          }
-
-          env {
-            name  = "MONGO_INITDB_USERNAME"
-            value = var.mongo_initdb_username
-          }
-
-          env {
-            name  = "MONGO_INITDB_PASSWORD"
-            value = var.mongo_initdb_password
-          }
-
-          volume_mount {
-            name       = "mongo-persistent-storage-claim"
-            mount_path = "/data/db"
-          }
-
-          resources {
-            limits = {
-              cpu    = "0.2"
-              memory = "200Mi"
-            }
-
-            requests = {
-              cpu    = "0.2"
-              memory = "200Mi"
-            }
-          }
-        }
-
-        volume {
-          name = "mongo"
-
-          config_map {
-            name = "mongo"
-          }
-        }
-      }
-    }
-
-    update_strategy {
-      type = "RollingUpdate"
-
-      rolling_update {
-        partition = 1
-      }
-    }
-
-    volume_claim_template {
-      metadata {
-        name = "mongo-persistent-storage-claim"
-
-        annotations = {
-          "volume.beta.kubernetes.io/storage-class" = "standard"
-        }
-      }
-
-      spec {
-        access_modes       = ["ReadWriteOnce"]
-        storage_class_name = "standard"
-        # storage_class_name = kubernetes_storage_class.this.metadata.name
-
-        resources {
-          requests = {
-            storage = "1Gi"
-          }
-        }
-      }
-    }
-  }
-}
-
-# resource "kubernetes_storage_class" "this" {
-#   metadata {
-#     name = "${var.cluster_name}-storage-class"
-#   }
-#   storage_provisioner = "kubernetes.io/gce-pd"
-#   reclaim_policy      = "Retain"
-#   parameters = {
-#     type = "pd-standard"
-#   }
-#   mount_options = ["file_mode=0700", "dir_mode=0777", "mfsymlinks", "uid=1000", "gid=1000", "nobrl", "cache=none"]
-# }
