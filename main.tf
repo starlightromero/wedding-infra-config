@@ -77,7 +77,7 @@ resource "kubernetes_ingress" "ingress" {
   ]
   metadata {
     name      = "${var.cluster_name}-ingress"
-    namespace = var.cluster_name
+    namespace = "kube-system"
     annotations = {
       "kubernetes.io/ingress.class"          = "nginx"
       "ingress.kubernetes.io/rewrite-target" = "/"
@@ -110,7 +110,7 @@ resource "kubernetes_ingress" "ingress_admin" {
   ]
   metadata {
     name      = "${var.cluster_name}-ingress-admin"
-    namespace = var.cluster_name
+    namespace = "kube-system"
     annotations = {
       "kubernetes.io/ingress.class"                        = "nginx"
       "ingress.kubernetes.io/rewrite-target"               = "/"
