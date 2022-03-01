@@ -10,14 +10,14 @@ variable "cluster_name" {
   default     = "wedding-app"
 }
 
-# variable "hostname" {
-#   type        = string
-#   description = "Hostname of website"
-#   default     = "charrington.xyz"
-# }
+variable "hostname" {
+  type        = string
+  description = "Hostname of website"
+  default     = "charrington.xyz"
+}
 
-# variable "mongodb_uri" {
-#   type        = string
-#   description = "Mongo database URI"
-#   sensitive   = true
-# }
+variable "mongodb_uri" {
+  type        = string
+  description = "Mongo database URI"
+  sensitive   = true
+}
